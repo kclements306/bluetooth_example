@@ -66,6 +66,9 @@ class BluetoothOffScreen extends StatelessWidget {
 }
 
 class FindDevicesScreen extends StatelessWidget {
+  // final Stream<List<ScanResult>> scanResults = FlutterBlue.instance.scanResults;
+  // final Stream<List<ScanResult>> filtered =
+  //     scanResults.where((ScanResult) => false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,18 +115,23 @@ class FindDevicesScreen extends StatelessWidget {
                 stream: FlutterBlue.instance.scanResults,
                 initialData: [],
                 builder: (c, snapshot) => Column(
-                  children: snapshot.data!
-                      .map(
-                        (r) => ScanResultTile(
-                          result: r,
-                          onTap: () => Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
+                  children: snapshot.data!.map((r) {
+                    if (r.device.name.isNotEmpty) {
+                      return ScanResultTile(
+                        result: r,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) {
                             r.device.connect();
                             return DeviceScreen(device: r.device);
-                          })),
+                          }),
                         ),
-                      )
-                      .toList(),
+                      );
+                    } else {
+                      return new ScanResultTile(
+                        result: r,
+                      );
+                    }
+                  }).toList(),
                 ),
               ),
             ],
